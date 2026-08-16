@@ -70,11 +70,26 @@ class DataIngestion:
     def split_data_as_train_test(self, df: pd.DataFrame):
         try:
             train_test_split_ratio = self.data_ingestion_config.train_test_split_ratio
+            ingested_dir = self.data_ingestion_config.ingested_dir
+            os.makedirs(ingested_dir, exist_ok=True)
 
             train_set, test_set = train_test_split(
                 df, train_size=train_test_split_ratio, random_state=42
             )
+            train_set.to_csv(
+                self.data_ingestion_config.training_file_path,
+                index=False,
+                header=True,
+            )
+            test_set.to_csv(
+                self.data_ingestion_config.testing_file_path,
+                index=False,
+                header=True,
+            )
             logging.info("Performed train test split")
+            logging.info(
+                f"Saved train data to {self.data_ingestion_config.training_file_path} and test data to {self.data_ingestion_config.testing_file_path}"
+            )
 
         except Exception as e:
             raise customException(e, sys) from e
