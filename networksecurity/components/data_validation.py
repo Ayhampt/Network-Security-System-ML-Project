@@ -32,10 +32,12 @@ class DataValidation:
 
     def validate_number_of_columns(self, dataframe: pd.DataFrame) -> bool:
         try:
-            number_of_columns = len(self.schema_config)
-            logger.info(f"Required number of columns: {number_of_columns}")
+            required_columns = [
+                list(column.keys())[0] for column in self.schema_config["columns"]
+            ]
+            logger.info(f"Required number of columns: {len(required_columns)}")
             logger.info(f"Dataframe has columns: {len(dataframe.columns)}")
-            if len(dataframe.columns) == number_of_columns:
+            if list(dataframe.columns) == required_columns:
                 return True
             return False
         except Exception as e:
@@ -51,7 +53,7 @@ class DataValidation:
                 d1 = base_df[column]
                 d2 = current_df[column]
                 is_same_dist = ks_2samp(d1, d2)
-                if threshold <= is_same_dist.pValue:
+                if threshold <= is_same_dist.pvalue:
                     is_found = False
                 else:
                     is_found = True
@@ -59,7 +61,7 @@ class DataValidation:
                 report.update(
                     {
                         column: {
-                            "p_value": float(is_same_dist.pValue),
+                            "p_value": float(is_same_dist.pvalue),
                             "drift_status": is_found,
                         }
                     }
@@ -79,7 +81,7 @@ class DataValidation:
             ## read data from train and test
 
             train_dataframe = DataValidation.read_data(train_file_path)
-            test_dataframe = DataValidation.read_data(train_file_path)
+            test_dataframe = DataValidation.read_data(test_file_path)
 
             ## Validate number of columns
 
@@ -110,10 +112,10 @@ class DataValidation:
 
             data_validation_artifact = DataValidationArtifact(
                 validation_status=status,
-                valid_train_file_path=self.data_ingestion_artifact.trained_file_path,
-                valid_test_file_path=self.data_ingestion_artifact.test_file_path,
-                invalid_train_file_path=None,
-                invalid_test_file_path=None,
+                valid_train_file_path=self.data_validation_config.valid_train_file_path,
+                valid_test_file_path=self.data_validation_config.valid_test_file_path,
+                invalid_train_file_path=self.data_validation_config.invalid_train_file_path,
+                invalid_test_file_path=self.data_validation_config.invalid_test_file_path,
                 drift_report_file_path=self.data_validation_config.drift_report_file_path,
             )
             return data_validation_artifact

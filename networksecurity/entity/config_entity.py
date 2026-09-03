@@ -42,29 +42,33 @@ class DataIngestionConfig:
         self.testing_file_path = os.path.join(
             self.ingested_dir, training_pipeline.TEST_FILE_NAME
         )
+
+
 class DataValidationConfig:
     def __init__(self, training_pipeline_config: TrainingPipelineConfig):
         self.validation_dir = os.path.join(
             training_pipeline_config.artifact_dir,
-            training_pipeline_config.DATA_VALIDATION_DIR_NAME
+            training_pipeline.DATA_VALIDATION_DIR_NAME,
         )
         self.valid_data_dir = os.path.join(
-            self.validation_dir,
-            training_pipeline_config.VALID_DATA_DIR
+            self.validation_dir, training_pipeline.VALID_DATA_DIR
         )
         self.invalid_data_dir = os.path.join(
-            self.validation_dir,
-            training_pipeline_config.INVALID_DATA_DIR
+            self.validation_dir, training_pipeline.INVALID_DATA_DIR
         )
         self.valid_train_file_path = os.path.join(
-            self.valid_data_dir,
-            training_pipeline_config.VALID_TRAIN_FILE_NAME
+            self.valid_data_dir, training_pipeline.VALID_TRAIN_FILE_NAME
+        )
+        self.valid_test_file_path = os.path.join(
+            self.valid_data_dir, training_pipeline.TEST_FILE_NAME
         )
         self.invalid_train_file_path = os.path.join(
-            self.invalid_data_dir,
-            training_pipeline_config.INVALID_TRAIN_FILE_NAME
+            self.invalid_data_dir, training_pipeline.INVALID_TRAIN_FILE_NAME
+        )
+        self.invalid_test_file_path = os.path.join(
+            self.invalid_data_dir, training_pipeline.TEST_FILE_NAME
         )
         self.drift_report_dir = os.path.join(
-            self.validation_dir,
-            training_pipeline_config.DRIFT_REPORT_DIR_NAME
+            self.validation_dir, training_pipeline.DRIFT_REPORT_DIR_NAME
         )
+        self.drift_report_file_path = os.path.join(self.drift_report_dir, "report.yaml")
