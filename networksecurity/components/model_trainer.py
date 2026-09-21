@@ -27,6 +27,12 @@ from sklearn.ensemble import (
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 import mlflow
+import dagshub
+from urllib.parse import urlparse
+
+dagshub.init(
+    repo_name="Network-Security-System-ML-Project", repo_owner="Ayhampt", mlflow=True
+)
 
 
 class ModelTrainer:
@@ -42,6 +48,11 @@ class ModelTrainer:
             raise customException(e, sys) from e
 
     def track_mlflow(self, best_model, classificationmetric):
+        mlflow.set_registry_uri(
+            "https://dagshub.com/Ayhampt/Network-Security-System-ML-Project.mlflow"
+        )
+        tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
+
         with mlflow.start_run():
             f1_score = classificationmetric.f1_score
             precision_score = classificationmetric.precision_score
@@ -51,6 +62,15 @@ class ModelTrainer:
             mlflow.log_metric("precision", precision_score)
             mlflow.log_metric("recall_score", recall_score)
             mlflow.sklearn.log_model(best_model, "model")
+
+            if tracking_url_type_store != "file":
+                mlflow.sklearn.log_model(
+                    sk_model=best_model,
+                    artifact_path="model",
+                    registered_model_name="NetworkSecurityBestModel",  #  Changed to a string
+                )
+            else:
+                mlflow.sklearn.log_model(sk_model=best_model, artifact_path="model")
 
     def train_model(self, x_train, y_train, x_test, y_test):
         try:
